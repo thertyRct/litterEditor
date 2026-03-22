@@ -302,7 +302,7 @@ export class LitterEditorWindow {
 							<SpinnerDesc>{ name: imgPrintYOffsetSpinner, type: "spinner", x: 188, y: 145, width: 55, height: widgetLineHeight, text: "0", onIncrement: () => { imgPrintYOffset = Math.min(128, imgPrintYOffset + 1); ui.getWindow(windowId).findWidget<SpinnerWidget>(imgPrintYOffsetSpinner).text = imgPrintYOffset.toString(); }, onDecrement: () => { imgPrintYOffset = Math.max(-128, imgPrintYOffset - 1); ui.getWindow(windowId).findWidget<SpinnerWidget>(imgPrintYOffsetSpinner).text = imgPrintYOffset.toString(); }, },
 							
 							<LabelWidget>{ type: "label", x: 15, y: 165, width: 62, height: widgetLineHeight, text: "Z Offset", isDisabled: true, },
-							<SpinnerDesc>{ name: imgPrintZOffsetSpinner, type: "spinner", x: 80, y: 165, width: 55, height: widgetLineHeight, text: "0", onIncrement: () => { imgPrintZOffset = Math.min(128, imgPrintZOffset + 1); ui.getWindow(windowId).findWidget<SpinnerWidget>(imgPrintZOffsetSpinner).text = imgPrintZOffset.toString(); }, onDecrement: () => { imgPrintZOffset = Math.max(-128, imgPrintZOffset - 1); ui.getWindow(windowId).findWidget<SpinnerWidget>(imgPrintZOffsetSpinner).text = imgPrintZOffset.toString(); }, },
+							<SpinnerDesc>{ name: imgPrintZOffsetSpinner, type: "spinner", x: 80, y: 165, width: 55, height: widgetLineHeight, text: "0", onIncrement: () => { imgPrintZOffset = Math.min(256, imgPrintZOffset + 1); ui.getWindow(windowId).findWidget<SpinnerWidget>(imgPrintZOffsetSpinner).text = imgPrintZOffset.toString(); }, onDecrement: () => { imgPrintZOffset = Math.max(-256, imgPrintZOffset - 1); ui.getWindow(windowId).findWidget<SpinnerWidget>(imgPrintZOffsetSpinner).text = imgPrintZOffset.toString(); }, },
 						],
 					},
 					// TAB 6: INFO
