@@ -548,15 +548,22 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 	const upperText = text.toUpperCase();
 	lastPlacedLitterIds = []; 
 
+	// PRE-CALCULATE HEIGHT: For vertical text, shift the whole word up
+	const charZStep = (CHAR_HEIGHT * diagTextZSpacing) + diagTextKerning;
+	const wordVerticalShift = (diagTextDirection === 1) ? ((upperText.length - 1) * charZStep) : 0;
+
 	for (let charIdx = 0; charIdx < upperText.length; charIdx++) {
 		const glyph = LITTER_FONT[upperText[charIdx]] ?? LITTER_FONT[" "];
 		for (let row = 0; row < CHAR_HEIGHT; row++) {
 			for (let col = 0; col < CHAR_WIDTH; col++) {
 				if (glyph[row][col] === 1) {
 					let lx: number, ly: number, lz: number;
+					
+					// HORIZONTAL TEXT
 					if (diagTextDirection === 0) {
 						const dx = (charIdx * charAdvanceX) + (col * diagTextXSpacing);
 						const dy = (charIdx * charAdvanceY) + (col * diagTextYSpacing);
+						
 						if (diagTextAlignment === 0) {
 							switch (rotation) {
 								case 0: lx = originCoords.x + diagTextXOffset - dx; ly = originCoords.y + diagTextYOffset + dy; break;
@@ -572,10 +579,14 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 								default: lx = originCoords.x + diagTextXOffset + dx; ly = originCoords.y + diagTextYOffset; break;
 							}
 						}
+						// Character builds upwards from ground
 						lz = baseZ + diagTextZOffset + (charIdx * diagTextBias) + ((CHAR_HEIGHT - 1 - row) * diagTextZSpacing);
+					
+					// VERTICAL TEXT
 					} else {
 						const colDx = (col * diagTextXSpacing) + (charIdx * diagTextBias);
 						const colDy = (col * diagTextYSpacing) + (charIdx * diagTextBias);
+						
 						if (diagTextAlignment === 0) {
 							switch (rotation) {
 								case 0: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
@@ -592,8 +603,10 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 								default: lx = originCoords.x + diagTextXOffset + axisAdvance; ly = originCoords.y + diagTextYOffset; break;
 							}
 						}
-						lz = baseZ + diagTextZOffset - (charIdx * ((CHAR_HEIGHT * diagTextZSpacing) + diagTextKerning)) + ((CHAR_HEIGHT - 1 - row) * diagTextZSpacing);
+						// Shift whole word UP, then subtract charIdx to stack downwards, and build char upwards
+						lz = baseZ + diagTextZOffset + wordVerticalShift - (charIdx * charZStep) + ((CHAR_HEIGHT - 1 - row) * diagTextZSpacing);
 					}
+					
 					const createdEntity = map.createEntity("litter", { x: lx, y: ly, z: lz });
 					if (createdEntity && createdEntity.id !== null) {
 						(<Litter>createdEntity).litterType = litterType;
@@ -647,6 +660,18 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 	const rotation = ui.mainViewport.rotation;
 	lastPlacedLitterIds = []; 
 
+	// PRE-CALCULATE HEIGHT: Sum all pixels to figure out how tall the image is
+	let totalPixels = 0;
+	const tempRegex = /(\d*)([A-LX])/g;
+	let tempMatch;
+	while ((tempMatch = tempRegex.exec(imgData)) !== null) {
+		totalPixels += tempMatch[1] ? parseInt(tempMatch[1], 10) : 1;
+	}
+	const imgHeight = Math.ceil(totalPixels / imgWidth);
+	
+	// If drawing a vertical wall, shift the whole thing up so the bottom hits the ground
+	const verticalShift = (imgPrintPlane > 0) ? ((imgHeight - 1) * imgPrintScale) : 0;
+
 	let pixelIndex = 0;
 	const regex = /(\d*)([A-LX])/g;
 	let match;
@@ -660,22 +685,18 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 			for (let i = 0; i < count; i++) {
 				const currentPos = pixelIndex + i;
 				
-				// Standard 2D Grid coordinates
 				const gridX = currentPos % imgWidth;
 				const gridY = Math.floor(currentPos / imgWidth);
 
-				// Origin with user offsets applied
 				const ox = originCoords.x + imgPrintXOffset;
 				const oy = originCoords.y + imgPrintYOffset;
 				const oz = baseZ + imgPrintZOffset;
 
-				// Scale coordinates
 				const dx = gridX * imgPrintScale;
 				const dy = gridY * imgPrintScale;
 
 				let lx: number = 0, ly: number = 0, lz: number = 0;
 
-				// Apply 3D math based on Plane selection
 				if (imgPrintPlane === 0) { 
 					// FLOOR (Lays flat on XY plane)
 					lz = oz;
@@ -687,7 +708,7 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 					}
 				} else if (imgPrintPlane === 1) {
 					// ORTHOG (Vertical wall, aligned to map grid)
-					lz = oz - dy;
+					lz = oz + verticalShift - dy; // Builds upward from baseZ!
 					switch (rotation) {
 						case 0: lx = ox + dx; ly = oy; break;
 						case 1: lx = ox; ly = oy + dx; break;
@@ -696,7 +717,7 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 					}
 				} else if (imgPrintPlane === 2) {
 					// DIAG (Vertical wall, square to isometric screen)
-					lz = oz - dy;
+					lz = oz + verticalShift - dy; // Builds upward from baseZ!
 					switch (rotation) {
 						case 0: lx = ox + dx; ly = oy - dx; break;
 						case 1: lx = ox + dx; ly = oy + dx; break;
