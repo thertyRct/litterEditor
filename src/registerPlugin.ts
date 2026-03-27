@@ -7,7 +7,7 @@ import { pluginVersion } from "./helpers/environment";
 registerPlugin({
 	name: "Litter Editor",
 	version: pluginVersion,
-	authors: ["Enox"],
+	authors: ["Enox", "therty"],
 	type: "local",
 	licence: "MIT",
 	targetApiVersion: 64,
