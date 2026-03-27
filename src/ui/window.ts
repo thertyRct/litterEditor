@@ -362,8 +362,19 @@ function selectLitter(type: EntityType): void {
 
 function setLitter(number: number): void {
 	const litterTypeList: LitterType[] = ["vomit", "vomit_alt", "empty_can", "rubbish", "burger_box", "empty_cup", "empty_box", "empty_bottle", "empty_bowl_red", "empty_drink_carton", "empty_juice_cup", "empty_bowl_blue"];
-	if (idLitter && !ui.getWindow(windowId).findWidget<ButtonWidget>(buttonCreateLitter).isPressed){ idLitter.litterType = litterTypeList[number]; }
-	else { selectedLitterType = litterTypeList[number]; }
+	
+	// Check if the Paintbrush tool is active
+	if (ui.tool && ui.tool.id === toolCreateLitter) {
+		selectedLitterType = litterTypeList[number];
+	} 
+
+	else if (idLitter) {
+		idLitter.litterType = litterTypeList[number];
+	} 
+
+	else {
+		selectedLitterType = litterTypeList[number];
+	}
 }
 
 function getLitter(type: LitterType): void {
