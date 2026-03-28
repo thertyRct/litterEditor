@@ -105,6 +105,8 @@ let imgPrintZOffset: number = 0;
 let imgPrintXOffset: number = 0;
 let imgPrintYOffset: number = 0;
 
+export const litterTypeList: LitterType[] = ["vomit", "vomit_alt", "empty_can", "rubbish", "burger_box", "empty_cup", "empty_box", "empty_bottle", "empty_bowl_red", "empty_drink_carton", "empty_juice_cup", "empty_bowl_blue"];
+
 // Undo State
 let lastPlacedLitterIds: number[] = [];
 
@@ -142,19 +144,19 @@ export class LitterEditorWindow {
 						widgets: [
 							
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Litter", },
-							<ButtonDesc>{ name: buttonPipette, type: "button", border: true, tooltip: "Select litter", x: 20, y: 75, width:25, height: 25, image: 29402, isPressed: false, onClick: () => selectLitter("litter") },
-							<ButtonDesc>{ name: buttonDelete, type: "button", border: true, tooltip: "Remove litter", x: 80, y: 75, width: 25, height: 25, image: 5165, isPressed: false, onClick: () => removeLitter("litter") },
-							<ButtonDesc>{ name: buttonCreateLitter, type: "button", border: true, tooltip: "Place litter", x: 50, y: 75, width: 25, height: 25, image: 5173, isPressed: false, onClick: () => createLitter("litter") },
+							<ButtonDesc>{ name: buttonPipette, type: "button", border: true, tooltip: "Select litter", x: 20, y: 75, width:25, height: 25, image: 29402, isPressed: false, onClick: () => this.selectLitter("litter") },
+							<ButtonDesc>{ name: buttonDelete, type: "button", border: true, tooltip: "Remove litter", x: 80, y: 75, width: 25, height: 25, image: 5165, isPressed: false, onClick: () => this.removeLitter("litter") },
+							<ButtonDesc>{ name: buttonCreateLitter, type: "button", border: true, tooltip: "Place litter", x: 50, y: 75, width: 25, height: 25, image: 5173, isPressed: false, onClick: () => this.createLitter("litter") },
 							<LabelWidget>{ name: litterTypeLabel, type: "label", x: 20, y: 110, width: 75, height: widgetLineHeight, text: "Litter Type", isDisabled: true, },
-							<DropdownDesc>{ name: litterTypeDropDown, type: "dropdown", x: 90, y: 110, width: 125, height: widgetLineHeight, items: ["Vomit", "Vomit Alt", "Empty Can", "Rubbish", "Burger Box", "Empty Cup", "Empty Box", "Empty Bottle", "Empty Bowl Red", "Empty Drink Carton", "Empty Juice Cup", "Empty Bowl Blue"], selectedIndex: -1, isDisabled: true, onChange: (number) => setLitter(number) },
+							<DropdownDesc>{ name: litterTypeDropDown, type: "dropdown", x: 90, y: 110, width: 125, height: widgetLineHeight, items: ["Vomit", "Vomit Alt", "Empty Can", "Rubbish", "Burger Box", "Empty Cup", "Empty Box", "Empty Bottle", "Empty Bowl Red", "Empty Drink Carton", "Empty Juice Cup", "Empty Bowl Blue"], selectedIndex: -1, isDisabled: true, onChange: (number) => this.setLitter(number) },
 							<LabelWidget>{ name: xPositionLabel, type: "label", x: 20, y: 135, width: 125, height: widgetLineHeight, text: "X-Position", isDisabled: true, },
-							<SpinnerDesc>{ name: xPositionSpinner, type: "spinner", x: 90, y: 135, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => increase(xPositionSpinner, "x"), onDecrement: () => decrease(xPositionSpinner, "x"), },
+							<SpinnerDesc>{ name: xPositionSpinner, type: "spinner", x: 90, y: 135, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => this.increase(xPositionSpinner, "x"), onDecrement: () => this.decrease(xPositionSpinner, "x"), },
 							<LabelWidget>{ name: yPositionLabel, type: "label", x: 20, y: 153, width: 125, height: widgetLineHeight, text: "Y-Position", isDisabled: true, },
-							<SpinnerDesc>{ name: yPositionSpinner, type: "spinner", x: 90, y: 153, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => increase(yPositionSpinner, "y"), onDecrement: () => decrease(yPositionSpinner, "y"), },
+							<SpinnerDesc>{ name: yPositionSpinner, type: "spinner", x: 90, y: 153, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => this.increase(yPositionSpinner, "y"), onDecrement: () => this.decrease(yPositionSpinner, "y"), },
 							<LabelWidget>{ name: zPositionLabel, type: "label", x: 20, y: 171, width: 125, height: widgetLineHeight, text: "Z-Position", isDisabled: true, },
-							<SpinnerDesc>{ name: zPositionSpinner, type: "spinner", x: 90, y: 171, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => increase(zPositionSpinner, "z"), onDecrement: () => decrease(zPositionSpinner, "z"), },
+							<SpinnerDesc>{ name: zPositionSpinner, type: "spinner", x: 90, y: 171, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => this.increase(zPositionSpinner, "z"), onDecrement: () => this.decrease(zPositionSpinner, "z"), },
 							<LabelWidget>{ name: multiplierLabel, type: "label", x: 20, y: 196, width: 125, height: widgetLineHeight, text: "Multiplier", isDisabled: true, },
-							<DropdownDesc>{ name: multiplierDropdown, type: "dropdown", x: 90, y: 196, width: 70, height: widgetLineHeight, items: multiplierIndex, selectedIndex: 0, isDisabled: true, onChange: (number) => setMultiplier(number) },
+							<DropdownDesc>{ name: multiplierDropdown, type: "dropdown", x: 90, y: 196, width: 70, height: widgetLineHeight, items: multiplierIndex, selectedIndex: 0, isDisabled: true, onChange: (number) => this.setMultiplier(number) },
 							<ViewportDesc>{ name: litterViewport, type: "viewport", x: 165, y: 135, width: 75, height: 75, }
 						],
 					},
@@ -314,146 +316,160 @@ export class LitterEditorWindow {
 			});
 		}
 	}
-}
 
-// --- TAB 1 FUNCTIONS ---
-function selectLitter(type: EntityType): void {
-	const window = ui.getWindow(windowId);
-	if (!window) return;
-	const buttonPicker = window.findWidget<ButtonWidget>(buttonPipette);
-	const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
-	const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
-	if (buttonPicker.isPressed !== false) {
-		buttonPicker.isPressed = false;
-		ui.tool?.cancel();
-	} else {
-		buttonPicker.isPressed = true;
-		deleteButton.isPressed = false;
-		createLitterButton.isPressed = false;
-		ui.activateTool({
-			id: toolSelectLitter, cursor: "cross_hair", filter: ["entity"],
-			onDown: e => {
-				if (e.entityId !== undefined) {
-					const entity = map.getEntity(e.entityId);
-					const litter = <Litter>entity;
-					idLitter = litter;
-					if (!entity || entity.type !== type) {
-						ui.showError("WARNING:", "This is not litter!");
-					} else {
-						getLitter(litter.litterType);
-						window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
-						window.findWidget<DropdownWidget>(litterTypeDropDown).isDisabled = false;
-						window.findWidget<DropdownWidget>(multiplierDropdown).isDisabled = false;
-						window.findWidget<SpinnerWidget>(xPositionSpinner).isDisabled = false;
-						window.findWidget<SpinnerWidget>(yPositionSpinner).isDisabled = false;
-						window.findWidget<SpinnerWidget>(zPositionSpinner).isDisabled = false;
-						ui.tool?.cancel();
-						getLitterCoords(litter);
-						window.findWidget<ViewportWidget>(litterViewport).viewport.moveTo(litter);
+	// --- TAB 1 FUNCTIONS ---
+	selectLitter(type: EntityType): void {
+		const window = ui.getWindow(windowId);
+		if (!window) return;
+		const buttonPicker = window.findWidget<ButtonWidget>(buttonPipette);
+		const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
+		const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
+		if (buttonPicker.isPressed !== false) {
+			buttonPicker.isPressed = false;
+			ui.tool?.cancel();
+		} else {
+			buttonPicker.isPressed = true;
+			deleteButton.isPressed = false;
+			createLitterButton.isPressed = false;
+			ui.activateTool({
+				id: toolSelectLitter, cursor: "cross_hair", filter: ["entity"],
+				onDown: e => {
+					if (e.entityId !== undefined) {
+						const entity = map.getEntity(e.entityId);
+						const litter = <Litter>entity;
+						idLitter = litter;
+						if (!entity || entity.type !== type) {
+							ui.showError("WARNING:", "This is not litter!");
+						} else {
+							this.getLitter(litter.litterType);
+							window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
+							window.findWidget<DropdownWidget>(litterTypeDropDown).isDisabled = false;
+							window.findWidget<DropdownWidget>(multiplierDropdown).isDisabled = false;
+							window.findWidget<SpinnerWidget>(xPositionSpinner).isDisabled = false;
+							window.findWidget<SpinnerWidget>(yPositionSpinner).isDisabled = false;
+							window.findWidget<SpinnerWidget>(zPositionSpinner).isDisabled = false;
+							ui.tool?.cancel();
+							this.getLitterCoords(litter);
+							window.findWidget<ViewportWidget>(litterViewport).viewport.moveTo(litter);
+						}
+					}
+				},
+			});
+		}
+	}
+
+	setLitter(number: number): void {
+		// Check if the Paintbrush tool is active
+		if (ui.tool && ui.tool.id === toolCreateLitter) {
+			selectedLitterType = litterTypeList[number];
+		} 
+
+		else if (idLitter) {
+			idLitter.litterType = litterTypeList[number];
+		} 
+
+		else {
+			selectedLitterType = litterTypeList[number];
+		}
+	}
+
+	getLitter(type: LitterType): void {
+		const window = ui.getWindow(windowId);
+		if (window) { window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex = litterTypeList.indexOf(type); }
+	}
+
+	removeLitter(type: EntityType): void {
+		const window =ui.getWindow(windowId);
+		if (!window) return;
+		const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
+		if (deleteButton.isPressed !== false) {
+			deleteButton.isPressed = false;
+			ui.tool?.cancel();
+		} else {
+			deleteButton.isPressed = true;
+			window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
+			window.findWidget<ButtonWidget>(buttonCreateLitter).isPressed = false;
+			ui.activateTool({
+				id: toolRemoveLitter, cursor: "bin_down", filter: ["entity"],
+				onDown: e => {
+					if (e.entityId !== undefined) {
+						const entity = map.getEntity(e.entityId);
+						if (entity && entity.type === type) { entity.remove(); }
 					}
 				}
-			},
-		});
+			});
+		}
 	}
-}
 
-function setLitter(number: number): void {
-	const litterTypeList: LitterType[] = ["vomit", "vomit_alt", "empty_can", "rubbish", "burger_box", "empty_cup", "empty_box", "empty_bottle", "empty_bowl_red", "empty_drink_carton", "empty_juice_cup", "empty_bowl_blue"];
-	
-	// Check if the Paintbrush tool is active
-	if (ui.tool && ui.tool.id === toolCreateLitter) {
-		selectedLitterType = litterTypeList[number];
-	} 
-
-	else if (idLitter) {
-		idLitter.litterType = litterTypeList[number];
-	} 
-
-	else {
-		selectedLitterType = litterTypeList[number];
-	}
-}
-
-function getLitter(type: LitterType): void {
-	const window = ui.getWindow(windowId);
-	const litterTypeNumber = ["vomit", "vomit_alt", "empty_can", "rubbish", "burger_box", "empty_cup", "empty_box", "empty_bottle", "empty_bowl_red", "empty_drink_carton", "empty_juice_cup", "empty_bowl_blue"];
-	if (window) { window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex = litterTypeNumber.indexOf(type); }
-}
-
-function removeLitter(type: EntityType): void {
-	const window =ui.getWindow(windowId);
-	if (!window) return;
-	const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
-	if (deleteButton.isPressed !== false) {
-		deleteButton.isPressed = false;
-		ui.tool?.cancel();
-	} else {
-		deleteButton.isPressed = true;
-		window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
-		window.findWidget<ButtonWidget>(buttonCreateLitter).isPressed = false;
-		ui.activateTool({
-			id: toolRemoveLitter, cursor: "bin_down", filter: ["entity"],
-			onDown: e => {
-				if (e.entityId !== undefined) {
-					const entity = map.getEntity(e.entityId);
-					if (entity && entity.type === type) { entity.remove(); }
+	createLitter(type: EntityType): void {
+		const window =ui.getWindow(windowId);
+		if (!window) return;
+		const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
+		if (createLitterButton.isPressed !== false) {
+			createLitterButton.isPressed = false;
+			ui.tool?.cancel();
+		} else {
+			createLitterButton.isPressed = true;
+			window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
+			window.findWidget<ButtonWidget>(buttonDelete).isPressed = false;
+			ui.activateTool({
+				id: toolCreateLitter, cursor: "cross_hair", filter: ["terrain"],
+				onDown: e => {
+					if (e.mapCoords !== undefined) {
+						const axisCoords = e.mapCoords;
+						const surfaceElements = getTileElements("surface", axisCoords);
+						const oneSurfaceElementZValue = surfaceElements[0].element.baseZ;
+						const createdEntity = map.createEntity(type, {x: axisCoords.x, y: axisCoords.y, z: oneSurfaceElementZValue});
+						if (createdEntity) { (<Litter>createdEntity).litterType = selectedLitterType; }
+					}
 				}
-			}
-		});
+			});
+		}
 	}
-}
 
-function createLitter(type: EntityType): void {
-	const window =ui.getWindow(windowId);
-	if (!window) return;
-	const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
-	if (createLitterButton.isPressed !== false) {
-		createLitterButton.isPressed = false;
-		ui.tool?.cancel();
-	} else {
-		createLitterButton.isPressed = true;
-		window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
-		window.findWidget<ButtonWidget>(buttonDelete).isPressed = false;
-		ui.activateTool({
-			id: toolCreateLitter, cursor: "cross_hair", filter: ["terrain"],
-			onDown: e => {
-				if (e.mapCoords !== undefined) {
-					const axisCoords = e.mapCoords;
-					const surfaceElements = getTileElements("surface", axisCoords);
-					const oneSurfaceElementZValue = surfaceElements[0].element.baseZ;
-					const createdEntity = map.createEntity(type, {x: axisCoords.x, y: axisCoords.y, z: oneSurfaceElementZValue});
-					if (createdEntity) { (<Litter>createdEntity).litterType = selectedLitterType; }
-				}
-			}
-		});
+	getLitterCoords(litterCoords: CoordsXYZ): void {
+		const window = ui.getWindow(windowId);
+		if (window) {
+			window.findWidget<SpinnerWidget>(xPositionSpinner).text = litterCoords.x.toString();
+			window.findWidget<SpinnerWidget>(yPositionSpinner).text = litterCoords.y.toString();
+			window.findWidget<SpinnerWidget>(zPositionSpinner).text = litterCoords.z.toString();
+		}
 	}
-}
 
-function getLitterCoords(litterCoords: CoordsXYZ): void {
-	const window = ui.getWindow(windowId);
-	if (window) {
-		window.findWidget<SpinnerWidget>(xPositionSpinner).text = litterCoords.x.toString();
-		window.findWidget<SpinnerWidget>(yPositionSpinner).text = litterCoords.y.toString();
-		window.findWidget<SpinnerWidget>(zPositionSpinner).text = litterCoords.z.toString();
+	increase(spinner: string, axis: keyof CoordsXYZ): void {
+		const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
+		idLitter[axis] = idLitter[axis] + 1 * multiplier;
+		widget.text = idLitter[axis].toString();
+		ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
 	}
-}
 
-function increase(spinner: string, axis: keyof CoordsXYZ): void {
-	const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
-	idLitter[axis] = idLitter[axis] + 1 * multiplier;
-	widget.text = idLitter[axis].toString();
-	ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
-}
+	decrease(spinner: string, axis: keyof CoordsXYZ): void {
+		const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
+		idLitter[axis] = idLitter[axis] - 1 * multiplier;
+		widget.text = idLitter[axis].toString();
+		ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
+	}
 
-function decrease(spinner: string, axis: keyof CoordsXYZ): void {
-	const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
-	idLitter[axis] = idLitter[axis] - 1 * multiplier;
-	widget.text = idLitter[axis].toString();
-	ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
-}
+	setMultiplier(number: number): void {
+		multiplier = number === 0 ? 1 : number === 1 ? 10 : 100;
+	}
 
-function setMultiplier(number: number): void {
-	multiplier = number === 0 ? 1 : number === 1 ? 10 : 100;
+	toggleMultiplier(): void {
+		const window = ui.getWindow(windowId);
+		if (!window) return;
+		const nextMultiplier = multiplier === 1 ? 10 : multiplier === 10 ? 100 : 1;
+		this.setMultiplier(nextMultiplier === 1 ? 0 : nextMultiplier === 10 ? 1 : 2);
+		window.findWidget<DropdownWidget>(multiplierDropdown).selectedIndex = nextMultiplier === 1 ? 0 : nextMultiplier === 10 ? 1 : 2;
+	}
+
+	cycleLitter(): void {
+		const window = ui.getWindow(windowId);
+		if (!window) return;
+		const dropdown = window.findWidget<DropdownWidget>(litterTypeDropDown);
+		const nextIndex = (dropdown.selectedIndex + 1) % litterTypeList.length;
+		dropdown.selectedIndex = nextIndex;
+		this.setLitter(nextIndex);
+	}
 }
 
 // --- TAB 3 FUNCTIONS (TRACK DIST) ---
