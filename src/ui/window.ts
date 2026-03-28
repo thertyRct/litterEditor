@@ -412,6 +412,13 @@ export class LitterEditorWindow {
 			createLitterButton.isPressed = true;
 			window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
 			window.findWidget<ButtonWidget>(buttonDelete).isPressed = false;
+
+			window.findWidget<DropdownWidget>(litterTypeDropDown).isDisabled = false;
+			if (window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex === -1) {
+				window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex = 0;
+				selectedLitterType = "vomit";
+			}
+
 			ui.activateTool({
 				id: toolCreateLitter, cursor: "cross_hair", filter: ["terrain"],
 				onDown: e => {
