@@ -16,6 +16,6 @@ export function litterCount(litterType: LitterType): string
             litterCount++;
         }
     }
-    )    
+    );    
     return litterCount.toString();
 }

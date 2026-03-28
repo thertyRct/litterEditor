@@ -1,4 +1,4 @@
-import { debug } from "../helpers/logger";
+//import { debug } from "../helpers/logger";
 import { isDevelopment, pluginVersion } from "../helpers/environment";
 import { getTileElements } from "../helpers/Z-Coords";
 import { litterCount, totalLitterCount } from "../helpers/litterStats";
@@ -140,7 +140,7 @@ export class LitterEditorWindow {
 					{
 						image: 5478,
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
+							
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Litter", },
 							<ButtonDesc>{ name: buttonPipette, type: "button", border: true, tooltip: "Select litter", x: 20, y: 75, width:25, height: 25, image: 29402, isPressed: false, onClick: () => selectLitter("litter") },
 							<ButtonDesc>{ name: buttonDelete, type: "button", border: true, tooltip: "Remove litter", x: 80, y: 75, width: 25, height: 25, image: 5165, isPressed: false, onClick: () => removeLitter("litter") },
@@ -162,7 +162,7 @@ export class LitterEditorWindow {
 					{
 						image: { frameBase: 5391, frameCount: 16, frameDuration: 4, },
 						widgets: [
-							<LabelDesc>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
+							
 							<GroupBoxDesc>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Statistics", },
 							<CustomDesc>{ type: "custom", x: 20, y: 80, width: 14, height: 14, onDraw: function (g) { const img = g.getImage(23101); if (img) { g.image(img.id, 7, 7); } } },
 							<LabelDesc>{ type: "label", x: 40, y: 80, width: 110, height: widgetLineHeight, text: `Vomit: {WHITE}${litterCount("vomit")}`, },
@@ -196,7 +196,6 @@ export class LitterEditorWindow {
 					{
 						image: 29367,
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Track Distributor", },
 							<LabelWidget>{ name: trackDistRideLabel, type: "label", x: 20, y: 72, width: 65, height: widgetLineHeight, text: "Ride", },
 							<DropdownDesc>{ name: trackDistRideDropdown, type: "dropdown", x: 90, y: 72, width: 150, height: widgetLineHeight, items: trackDistRideItems.length > 0 ? trackDistRideItems : ["(no rides)"], selectedIndex: 0, onChange: (index: number) => onTrackDistRideChanged(index), },
@@ -214,7 +213,6 @@ export class LitterEditorWindow {
 					{
 						image: { frameBase: 5221, frameCount: 8, frameDuration: 4, },
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 185, text: "Diagonal Text", },
 							<LabelWidget>{ name: diagTextLabel, type: "label", x: 20, y: 75, width: 50, height: widgetLineHeight, text: "Text", isDisabled: true, },
 							<ButtonDesc>{
@@ -266,7 +264,6 @@ export class LitterEditorWindow {
 					{
 						image: { frameBase: 5173, frameCount: 8, frameDuration: 4, }, // Paintbrush/Scenery icon
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Image Printer", },
 							<LabelWidget>{ name: imgPrintStringLabel, type: "label", x: 20, y: 75, width: 50, height: widgetLineHeight, text: "Data", isDisabled: true, },
 							<ButtonDesc>{
@@ -563,7 +560,6 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 					if (diagTextDirection === 0) {
 						const dx = (charIdx * charAdvanceX) + (col * diagTextXSpacing);
 						const dy = (charIdx * charAdvanceY) + (col * diagTextYSpacing);
-						
 						if (diagTextAlignment === 0) {
 							switch (rotation) {
 								case 0: lx = originCoords.x + diagTextXOffset - dx; ly = originCoords.y + diagTextYOffset + dy; break;
@@ -573,10 +569,10 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 							}
 						} else {
 							switch (rotation) {
-								case 0: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + dy; break;
-								case 1: lx = originCoords.x + diagTextXOffset - dx; ly = originCoords.y + diagTextYOffset; break;
-								case 2: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - dy; break;
-								default: lx = originCoords.x + diagTextXOffset + dx; ly = originCoords.y + diagTextYOffset; break;
+								case 0: lx = originCoords.x + diagTextXOffset - dx; ly = originCoords.y + diagTextYOffset; break;
+								case 1: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - dy; break;
+								case 2: lx = originCoords.x + diagTextXOffset + dx; ly = originCoords.y + diagTextYOffset; break;
+								default: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + dy; break;
 							}
 						}
 						// Character builds upwards from ground
@@ -584,23 +580,22 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 					
 					// VERTICAL TEXT
 					} else {
-						const colDx = (col * diagTextXSpacing) + (charIdx * diagTextBias);
-						const colDy = (col * diagTextYSpacing) + (charIdx * diagTextBias);
-						
-						if (diagTextAlignment === 0) {
+				const colDx = (col * diagTextXSpacing) + (charIdx * diagTextBias);
+				const colDy = (col * diagTextYSpacing) + (charIdx * diagTextBias);
+				if (diagTextAlignment === 0) {
+					switch (rotation) {
+						case 0: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
+						case 1: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
+						case 2: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
+						default: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
+					}
+				} else {
+					const axisAdvance = (col * diagTextXSpacing) + (charIdx * diagTextBias);
 							switch (rotation) {
-								case 0: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
-								case 1: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
-								case 2: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
-								default: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
-							}
-						} else {
-							const axisAdvance = (col * diagTextXSpacing) + (charIdx * diagTextBias);
-							switch (rotation) {
-								case 0: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + axisAdvance; break;
-								case 1: lx = originCoords.x + diagTextXOffset - axisAdvance; ly = originCoords.y + diagTextYOffset; break;
-								case 2: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - axisAdvance; break;
-								default: lx = originCoords.x + diagTextXOffset + axisAdvance; ly = originCoords.y + diagTextYOffset; break;
+						case 0: lx = originCoords.x + diagTextXOffset - axisAdvance; ly = originCoords.y + diagTextYOffset; break;
+										case 1: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - axisAdvance; break;
+										case 2: lx = originCoords.x + diagTextXOffset + axisAdvance; ly = originCoords.y + diagTextYOffset; break;
+										default: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + axisAdvance; break;
 							}
 						}
 						// Shift whole word UP, then subtract charIdx to stack downwards, and build char upwards
@@ -701,28 +696,28 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 					// FLOOR (Lays flat on XY plane)
 					lz = oz;
 					switch (rotation) {
-						case 0: lx = ox + dx; ly = oy + dy; break;
-						case 1: lx = ox - dy; ly = oy + dx; break;
-						case 2: lx = ox - dx; ly = oy - dy; break;
-						case 3: lx = ox + dy; ly = oy - dx; break;
+						case 0: lx = ox - dx; ly = oy + dy; break;
+						case 1: lx = ox - dy; ly = oy - dx; break;
+						case 2: lx = ox + dx; ly = oy - dy; break;
+						case 3: lx = ox + dy; ly = oy + dx; break;
 					}
 				} else if (imgPrintPlane === 1) {
 					// ORTHOG (Vertical wall, aligned to map grid)
 					lz = oz + verticalShift - dy; // Builds upward from baseZ!
 					switch (rotation) {
-						case 0: lx = ox + dx; ly = oy; break;
-						case 1: lx = ox; ly = oy + dx; break;
-						case 2: lx = ox - dx; ly = oy; break;
-						case 3: lx = ox; ly = oy - dx; break;
+					case 0: lx = ox - dx; ly = oy; break;
+					case 1: lx = ox; ly = oy - dx; break;
+					case 2: lx = ox + dx; ly = oy; break;
+					case 3: lx = ox; ly = oy + dx; break;
 					}
 				} else if (imgPrintPlane === 2) {
 					// DIAG (Vertical wall, square to isometric screen)
 					lz = oz + verticalShift - dy; // Builds upward from baseZ!
 					switch (rotation) {
-						case 0: lx = ox + dx; ly = oy - dx; break;
-						case 1: lx = ox + dx; ly = oy + dx; break;
-						case 2: lx = ox - dx; ly = oy + dx; break;
-						case 3: lx = ox - dx; ly = oy - dx; break;
+						case 0: lx = ox - dx; ly = oy + dx; break;
+						case 1: lx = ox - dx; ly = oy - dx; break;
+						case 2: lx = ox + dx; ly = oy - dx; break;
+						case 3: lx = ox + dx; ly = oy + dx; break;
 					}
 				}
 
@@ -755,12 +750,12 @@ function undoLastPlacement(): void {
 		ui.showError("Undo", "Nothing to undo!");
 		return;
 	}
-	let removedCount = 0;
+	//let removedCount = 0;
 	for (let i = 0; i < lastPlacedLitterIds.length; i++) {
 		const entity = map.getEntity(lastPlacedLitterIds[i]);
 		if (entity && entity.type === "litter") {
 			entity.remove();
-			removedCount++;
+			//removedCount++;
 		}
 	}
 	lastPlacedLitterIds = []; 
