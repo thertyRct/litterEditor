@@ -1,4 +1,4 @@
-import { debug } from "../helpers/logger";
+//import { debug } from "../helpers/logger";
 import { isDevelopment, pluginVersion } from "../helpers/environment";
 import { getTileElements } from "../helpers/Z-Coords";
 import { litterCount, totalLitterCount } from "../helpers/litterStats";
@@ -105,6 +105,8 @@ let imgPrintZOffset: number = 0;
 let imgPrintXOffset: number = 0;
 let imgPrintYOffset: number = 0;
 
+export const litterTypeList: LitterType[] = ["vomit", "vomit_alt", "empty_can", "rubbish", "burger_box", "empty_cup", "empty_box", "empty_bottle", "empty_bowl_red", "empty_drink_carton", "empty_juice_cup", "empty_bowl_blue"];
+
 // Undo State
 let lastPlacedLitterIds: number[] = [];
 
@@ -140,21 +142,21 @@ export class LitterEditorWindow {
 					{
 						image: 5478,
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
+							
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Litter", },
-							<ButtonDesc>{ name: buttonPipette, type: "button", border: true, tooltip: "Select litter", x: 20, y: 75, width:25, height: 25, image: 29402, isPressed: false, onClick: () => selectLitter("litter") },
-							<ButtonDesc>{ name: buttonDelete, type: "button", border: true, tooltip: "Remove litter", x: 80, y: 75, width: 25, height: 25, image: 5165, isPressed: false, onClick: () => removeLitter("litter") },
-							<ButtonDesc>{ name: buttonCreateLitter, type: "button", border: true, tooltip: "Place litter", x: 50, y: 75, width: 25, height: 25, image: 5173, isPressed: false, onClick: () => createLitter("litter") },
+							<ButtonDesc>{ name: buttonPipette, type: "button", border: true, tooltip: "Select litter", x: 20, y: 75, width:25, height: 25, image: 29402, isPressed: false, onClick: () => this.selectLitter("litter") },
+							<ButtonDesc>{ name: buttonDelete, type: "button", border: true, tooltip: "Remove litter", x: 80, y: 75, width: 25, height: 25, image: 5165, isPressed: false, onClick: () => this.removeLitter("litter") },
+							<ButtonDesc>{ name: buttonCreateLitter, type: "button", border: true, tooltip: "Place litter", x: 50, y: 75, width: 25, height: 25, image: 5173, isPressed: false, onClick: () => this.createLitter("litter") },
 							<LabelWidget>{ name: litterTypeLabel, type: "label", x: 20, y: 110, width: 75, height: widgetLineHeight, text: "Litter Type", isDisabled: true, },
-							<DropdownDesc>{ name: litterTypeDropDown, type: "dropdown", x: 90, y: 110, width: 125, height: widgetLineHeight, items: ["Vomit", "Vomit Alt", "Empty Can", "Rubbish", "Burger Box", "Empty Cup", "Empty Box", "Empty Bottle", "Empty Bowl Red", "Empty Drink Carton", "Empty Juice Cup", "Empty Bowl Blue"], selectedIndex: -1, isDisabled: true, onChange: (number) => setLitter(number) },
+							<DropdownDesc>{ name: litterTypeDropDown, type: "dropdown", x: 90, y: 110, width: 125, height: widgetLineHeight, items: ["Vomit", "Vomit Alt", "Empty Can", "Rubbish", "Burger Box", "Empty Cup", "Empty Box", "Empty Bottle", "Empty Bowl Red", "Empty Drink Carton", "Empty Juice Cup", "Empty Bowl Blue"], selectedIndex: -1, isDisabled: true, onChange: (number) => this.setLitter(number) },
 							<LabelWidget>{ name: xPositionLabel, type: "label", x: 20, y: 135, width: 125, height: widgetLineHeight, text: "X-Position", isDisabled: true, },
-							<SpinnerDesc>{ name: xPositionSpinner, type: "spinner", x: 90, y: 135, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => increase(xPositionSpinner, "x"), onDecrement: () => decrease(xPositionSpinner, "x"), },
+							<SpinnerDesc>{ name: xPositionSpinner, type: "spinner", x: 90, y: 135, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => this.increase(xPositionSpinner, "x"), onDecrement: () => this.decrease(xPositionSpinner, "x"), },
 							<LabelWidget>{ name: yPositionLabel, type: "label", x: 20, y: 153, width: 125, height: widgetLineHeight, text: "Y-Position", isDisabled: true, },
-							<SpinnerDesc>{ name: yPositionSpinner, type: "spinner", x: 90, y: 153, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => increase(yPositionSpinner, "y"), onDecrement: () => decrease(yPositionSpinner, "y"), },
+							<SpinnerDesc>{ name: yPositionSpinner, type: "spinner", x: 90, y: 153, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => this.increase(yPositionSpinner, "y"), onDecrement: () => this.decrease(yPositionSpinner, "y"), },
 							<LabelWidget>{ name: zPositionLabel, type: "label", x: 20, y: 171, width: 125, height: widgetLineHeight, text: "Z-Position", isDisabled: true, },
-							<SpinnerDesc>{ name: zPositionSpinner, type: "spinner", x: 90, y: 171, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => increase(zPositionSpinner, "z"), onDecrement: () => decrease(zPositionSpinner, "z"), },
+							<SpinnerDesc>{ name: zPositionSpinner, type: "spinner", x: 90, y: 171, width: 70, height: widgetLineHeight, text: " ", isDisabled: true, onIncrement: () => this.increase(zPositionSpinner, "z"), onDecrement: () => this.decrease(zPositionSpinner, "z"), },
 							<LabelWidget>{ name: multiplierLabel, type: "label", x: 20, y: 196, width: 125, height: widgetLineHeight, text: "Multiplier", isDisabled: true, },
-							<DropdownDesc>{ name: multiplierDropdown, type: "dropdown", x: 90, y: 196, width: 70, height: widgetLineHeight, items: multiplierIndex, selectedIndex: 0, isDisabled: true, onChange: (number) => setMultiplier(number) },
+							<DropdownDesc>{ name: multiplierDropdown, type: "dropdown", x: 90, y: 196, width: 70, height: widgetLineHeight, items: multiplierIndex, selectedIndex: 0, isDisabled: true, onChange: (number) => this.setMultiplier(number) },
 							<ViewportDesc>{ name: litterViewport, type: "viewport", x: 165, y: 135, width: 75, height: 75, }
 						],
 					},
@@ -162,7 +164,7 @@ export class LitterEditorWindow {
 					{
 						image: { frameBase: 5391, frameCount: 16, frameDuration: 4, },
 						widgets: [
-							<LabelDesc>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
+							
 							<GroupBoxDesc>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Statistics", },
 							<CustomDesc>{ type: "custom", x: 20, y: 80, width: 14, height: 14, onDraw: function (g) { const img = g.getImage(23101); if (img) { g.image(img.id, 7, 7); } } },
 							<LabelDesc>{ type: "label", x: 40, y: 80, width: 110, height: widgetLineHeight, text: `Vomit: {WHITE}${litterCount("vomit")}`, },
@@ -196,7 +198,6 @@ export class LitterEditorWindow {
 					{
 						image: 29367,
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Track Distributor", },
 							<LabelWidget>{ name: trackDistRideLabel, type: "label", x: 20, y: 72, width: 65, height: widgetLineHeight, text: "Ride", },
 							<DropdownDesc>{ name: trackDistRideDropdown, type: "dropdown", x: 90, y: 72, width: 150, height: widgetLineHeight, items: trackDistRideItems.length > 0 ? trackDistRideItems : ["(no rides)"], selectedIndex: 0, onChange: (index: number) => onTrackDistRideChanged(index), },
@@ -214,7 +215,6 @@ export class LitterEditorWindow {
 					{
 						image: { frameBase: 5221, frameCount: 8, frameDuration: 4, },
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 185, text: "Diagonal Text", },
 							<LabelWidget>{ name: diagTextLabel, type: "label", x: 20, y: 75, width: 50, height: widgetLineHeight, text: "Text", isDisabled: true, },
 							<ButtonDesc>{
@@ -266,7 +266,6 @@ export class LitterEditorWindow {
 					{
 						image: { frameBase: 5173, frameCount: 8, frameDuration: 4, }, // Paintbrush/Scenery icon
 						widgets: [
-							<LabelWidget>{ type: "label", x: 0, y: 232, width: 260, height: widgetLineHeight, textAlign: "centred", text: "github.com/EnoxRCT/OpenRCT2-LitterEditor", isDisabled: true, },
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Image Printer", },
 							<LabelWidget>{ name: imgPrintStringLabel, type: "label", x: 20, y: 75, width: 50, height: widgetLineHeight, text: "Data", isDisabled: true, },
 							<ButtonDesc>{
@@ -307,7 +306,7 @@ export class LitterEditorWindow {
 					},
 					// TAB 6: INFO
 					{
-						image: { frameBase: 5367, frameCount: 8, frameDuration: 4, },
+						image:  5367,
 						widgets: [
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Info", },
 							<LabelWidget>{ type: "label", x: 20, y: 120, width: 220, height: widgetLineHeight, textAlign: "centred", text: "This LitterEditor is my first expierence with coding.\n\nSpecial thanks to:\nManticore_007, Basssiiie, Smitty\nand Gymnasiast.\n\ngithub.com/EnoxRCT/OpenRCT2-LitterEditor", },
@@ -317,146 +316,167 @@ export class LitterEditorWindow {
 			});
 		}
 	}
-}
 
-// --- TAB 1 FUNCTIONS ---
-function selectLitter(type: EntityType): void {
-	const window = ui.getWindow(windowId);
-	if (!window) return;
-	const buttonPicker = window.findWidget<ButtonWidget>(buttonPipette);
-	const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
-	const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
-	if (buttonPicker.isPressed !== false) {
-		buttonPicker.isPressed = false;
-		ui.tool?.cancel();
-	} else {
-		buttonPicker.isPressed = true;
-		deleteButton.isPressed = false;
-		createLitterButton.isPressed = false;
-		ui.activateTool({
-			id: toolSelectLitter, cursor: "cross_hair", filter: ["entity"],
-			onDown: e => {
-				if (e.entityId !== undefined) {
-					const entity = map.getEntity(e.entityId);
-					const litter = <Litter>entity;
-					idLitter = litter;
-					if (!entity || entity.type !== type) {
-						ui.showError("WARNING:", "This is not litter!");
-					} else {
-						getLitter(litter.litterType);
-						window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
-						window.findWidget<DropdownWidget>(litterTypeDropDown).isDisabled = false;
-						window.findWidget<DropdownWidget>(multiplierDropdown).isDisabled = false;
-						window.findWidget<SpinnerWidget>(xPositionSpinner).isDisabled = false;
-						window.findWidget<SpinnerWidget>(yPositionSpinner).isDisabled = false;
-						window.findWidget<SpinnerWidget>(zPositionSpinner).isDisabled = false;
-						ui.tool?.cancel();
-						getLitterCoords(litter);
-						window.findWidget<ViewportWidget>(litterViewport).viewport.moveTo(litter);
+	// --- TAB 1 FUNCTIONS ---
+	selectLitter(type: EntityType): void {
+		const window = ui.getWindow(windowId);
+		if (!window) return;
+		const buttonPicker = window.findWidget<ButtonWidget>(buttonPipette);
+		const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
+		const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
+		if (buttonPicker.isPressed !== false) {
+			buttonPicker.isPressed = false;
+			ui.tool?.cancel();
+		} else {
+			buttonPicker.isPressed = true;
+			deleteButton.isPressed = false;
+			createLitterButton.isPressed = false;
+			ui.activateTool({
+				id: toolSelectLitter, cursor: "cross_hair", filter: ["entity"],
+				onDown: e => {
+					if (e.entityId !== undefined) {
+						const entity = map.getEntity(e.entityId);
+						const litter = <Litter>entity;
+						idLitter = litter;
+						if (!entity || entity.type !== type) {
+							ui.showError("WARNING:", "This is not litter!");
+						} else {
+							this.getLitter(litter.litterType);
+							window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
+							window.findWidget<DropdownWidget>(litterTypeDropDown).isDisabled = false;
+							window.findWidget<DropdownWidget>(multiplierDropdown).isDisabled = false;
+							window.findWidget<SpinnerWidget>(xPositionSpinner).isDisabled = false;
+							window.findWidget<SpinnerWidget>(yPositionSpinner).isDisabled = false;
+							window.findWidget<SpinnerWidget>(zPositionSpinner).isDisabled = false;
+							ui.tool?.cancel();
+							this.getLitterCoords(litter);
+							window.findWidget<ViewportWidget>(litterViewport).viewport.moveTo(litter);
+						}
+					}
+				},
+			});
+		}
+	}
+
+	setLitter(number: number): void {
+		// Check if the Paintbrush tool is active
+		if (ui.tool && ui.tool.id === toolCreateLitter) {
+			selectedLitterType = litterTypeList[number];
+		} 
+
+		else if (idLitter) {
+			idLitter.litterType = litterTypeList[number];
+		} 
+
+		else {
+			selectedLitterType = litterTypeList[number];
+		}
+	}
+
+	getLitter(type: LitterType): void {
+		const window = ui.getWindow(windowId);
+		if (window) { window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex = litterTypeList.indexOf(type); }
+	}
+
+	removeLitter(type: EntityType): void {
+		const window =ui.getWindow(windowId);
+		if (!window) return;
+		const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
+		if (deleteButton.isPressed !== false) {
+			deleteButton.isPressed = false;
+			ui.tool?.cancel();
+		} else {
+			deleteButton.isPressed = true;
+			window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
+			window.findWidget<ButtonWidget>(buttonCreateLitter).isPressed = false;
+			ui.activateTool({
+				id: toolRemoveLitter, cursor: "bin_down", filter: ["entity"],
+				onDown: e => {
+					if (e.entityId !== undefined) {
+						const entity = map.getEntity(e.entityId);
+						if (entity && entity.type === type) { entity.remove(); }
 					}
 				}
-			},
-		});
+			});
+		}
 	}
-}
 
-function setLitter(number: number): void {
-	const litterTypeList: LitterType[] = ["vomit", "vomit_alt", "empty_can", "rubbish", "burger_box", "empty_cup", "empty_box", "empty_bottle", "empty_bowl_red", "empty_drink_carton", "empty_juice_cup", "empty_bowl_blue"];
-	
-	// Check if the Paintbrush tool is active
-	if (ui.tool && ui.tool.id === toolCreateLitter) {
-		selectedLitterType = litterTypeList[number];
-	} 
+	createLitter(type: EntityType): void {
+		const window =ui.getWindow(windowId);
+		if (!window) return;
+		const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
+		if (createLitterButton.isPressed !== false) {
+			createLitterButton.isPressed = false;
+			ui.tool?.cancel();
+		} else {
+			createLitterButton.isPressed = true;
+			window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
+			window.findWidget<ButtonWidget>(buttonDelete).isPressed = false;
 
-	else if (idLitter) {
-		idLitter.litterType = litterTypeList[number];
-	} 
-
-	else {
-		selectedLitterType = litterTypeList[number];
-	}
-}
-
-function getLitter(type: LitterType): void {
-	const window = ui.getWindow(windowId);
-	const litterTypeNumber = ["vomit", "vomit_alt", "empty_can", "rubbish", "burger_box", "empty_cup", "empty_box", "empty_bottle", "empty_bowl_red", "empty_drink_carton", "empty_juice_cup", "empty_bowl_blue"];
-	if (window) { window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex = litterTypeNumber.indexOf(type); }
-}
-
-function removeLitter(type: EntityType): void {
-	const window =ui.getWindow(windowId);
-	if (!window) return;
-	const deleteButton = window.findWidget<ButtonWidget>(buttonDelete);
-	if (deleteButton.isPressed !== false) {
-		deleteButton.isPressed = false;
-		ui.tool?.cancel();
-	} else {
-		deleteButton.isPressed = true;
-		window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
-		window.findWidget<ButtonWidget>(buttonCreateLitter).isPressed = false;
-		ui.activateTool({
-			id: toolRemoveLitter, cursor: "bin_down", filter: ["entity"],
-			onDown: e => {
-				if (e.entityId !== undefined) {
-					const entity = map.getEntity(e.entityId);
-					if (entity && entity.type === type) { entity.remove(); }
-				}
+			window.findWidget<DropdownWidget>(litterTypeDropDown).isDisabled = false;
+			if (window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex === -1) {
+				window.findWidget<DropdownWidget>(litterTypeDropDown).selectedIndex = 0;
+				selectedLitterType = "vomit";
 			}
-		});
-	}
-}
 
-function createLitter(type: EntityType): void {
-	const window =ui.getWindow(windowId);
-	if (!window) return;
-	const createLitterButton = window.findWidget<ButtonWidget>(buttonCreateLitter);
-	if (createLitterButton.isPressed !== false) {
-		createLitterButton.isPressed = false;
-		ui.tool?.cancel();
-	} else {
-		createLitterButton.isPressed = true;
-		window.findWidget<ButtonWidget>(buttonPipette).isPressed = false;
-		window.findWidget<ButtonWidget>(buttonDelete).isPressed = false;
-		ui.activateTool({
-			id: toolCreateLitter, cursor: "cross_hair", filter: ["terrain"],
-			onDown: e => {
-				if (e.mapCoords !== undefined) {
-					const axisCoords = e.mapCoords;
-					const surfaceElements = getTileElements("surface", axisCoords);
-					const oneSurfaceElementZValue = surfaceElements[0].element.baseZ;
-					const createdEntity = map.createEntity(type, {x: axisCoords.x, y: axisCoords.y, z: oneSurfaceElementZValue});
-					if (createdEntity) { (<Litter>createdEntity).litterType = selectedLitterType; }
+			ui.activateTool({
+				id: toolCreateLitter, cursor: "cross_hair", filter: ["terrain"],
+				onDown: e => {
+					if (e.mapCoords !== undefined) {
+						const axisCoords = e.mapCoords;
+						const surfaceElements = getTileElements("surface", axisCoords);
+						const oneSurfaceElementZValue = surfaceElements[0].element.baseZ;
+						const createdEntity = map.createEntity(type, {x: axisCoords.x, y: axisCoords.y, z: oneSurfaceElementZValue});
+						if (createdEntity) { (<Litter>createdEntity).litterType = selectedLitterType; }
+					}
 				}
-			}
-		});
+			});
+		}
 	}
-}
 
-function getLitterCoords(litterCoords: CoordsXYZ): void {
-	const window = ui.getWindow(windowId);
-	if (window) {
-		window.findWidget<SpinnerWidget>(xPositionSpinner).text = litterCoords.x.toString();
-		window.findWidget<SpinnerWidget>(yPositionSpinner).text = litterCoords.y.toString();
-		window.findWidget<SpinnerWidget>(zPositionSpinner).text = litterCoords.z.toString();
+	getLitterCoords(litterCoords: CoordsXYZ): void {
+		const window = ui.getWindow(windowId);
+		if (window) {
+			window.findWidget<SpinnerWidget>(xPositionSpinner).text = litterCoords.x.toString();
+			window.findWidget<SpinnerWidget>(yPositionSpinner).text = litterCoords.y.toString();
+			window.findWidget<SpinnerWidget>(zPositionSpinner).text = litterCoords.z.toString();
+		}
 	}
-}
 
-function increase(spinner: string, axis: keyof CoordsXYZ): void {
-	const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
-	idLitter[axis] = idLitter[axis] + 1 * multiplier;
-	widget.text = idLitter[axis].toString();
-	ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
-}
+	increase(spinner: string, axis: keyof CoordsXYZ): void {
+		const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
+		idLitter[axis] = idLitter[axis] + 1 * multiplier;
+		widget.text = idLitter[axis].toString();
+		ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
+	}
 
-function decrease(spinner: string, axis: keyof CoordsXYZ): void {
-	const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
-	idLitter[axis] = idLitter[axis] - 1 * multiplier;
-	widget.text = idLitter[axis].toString();
-	ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
-}
+	decrease(spinner: string, axis: keyof CoordsXYZ): void {
+		const widget = ui.getWindow(windowId).findWidget<SpinnerWidget>(spinner);
+		idLitter[axis] = idLitter[axis] - 1 * multiplier;
+		widget.text = idLitter[axis].toString();
+		ui.getWindow(windowId).findWidget<ViewportWidget>(litterViewport).viewport.moveTo(idLitter);
+	}
 
-function setMultiplier(number: number): void {
-	multiplier = number === 0 ? 1 : number === 1 ? 10 : 100;
+	setMultiplier(number: number): void {
+		multiplier = number === 0 ? 1 : number === 1 ? 10 : 100;
+	}
+
+	toggleMultiplier(): void {
+		const window = ui.getWindow(windowId);
+		if (!window) return;
+		const nextMultiplier = multiplier === 1 ? 10 : multiplier === 10 ? 100 : 1;
+		this.setMultiplier(nextMultiplier === 1 ? 0 : nextMultiplier === 10 ? 1 : 2);
+		window.findWidget<DropdownWidget>(multiplierDropdown).selectedIndex = nextMultiplier === 1 ? 0 : nextMultiplier === 10 ? 1 : 2;
+	}
+
+	cycleLitter(): void {
+		const window = ui.getWindow(windowId);
+		if (!window) return;
+		const dropdown = window.findWidget<DropdownWidget>(litterTypeDropDown);
+		const nextIndex = (dropdown.selectedIndex + 1) % litterTypeList.length;
+		dropdown.selectedIndex = nextIndex;
+		this.setLitter(nextIndex);
+	}
 }
 
 // --- TAB 3 FUNCTIONS (TRACK DIST) ---
@@ -548,12 +568,18 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 	const upperText = text.toUpperCase();
 	lastPlacedLitterIds = []; 
 
+	// PRE-CALCULATE HEIGHT: For vertical text, shift the whole word up
+	const charZStep = (CHAR_HEIGHT * diagTextZSpacing) + diagTextKerning;
+	const wordVerticalShift = (diagTextDirection === 1) ? ((upperText.length - 1) * charZStep) : 0;
+
 	for (let charIdx = 0; charIdx < upperText.length; charIdx++) {
 		const glyph = LITTER_FONT[upperText[charIdx]] ?? LITTER_FONT[" "];
 		for (let row = 0; row < CHAR_HEIGHT; row++) {
 			for (let col = 0; col < CHAR_WIDTH; col++) {
 				if (glyph[row][col] === 1) {
 					let lx: number, ly: number, lz: number;
+					
+					// HORIZONTAL TEXT
 					if (diagTextDirection === 0) {
 						const dx = (charIdx * charAdvanceX) + (col * diagTextXSpacing);
 						const dy = (charIdx * charAdvanceY) + (col * diagTextYSpacing);
@@ -566,34 +592,39 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 							}
 						} else {
 							switch (rotation) {
-								case 0: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + dy; break;
-								case 1: lx = originCoords.x + diagTextXOffset - dx; ly = originCoords.y + diagTextYOffset; break;
-								case 2: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - dy; break;
-								default: lx = originCoords.x + diagTextXOffset + dx; ly = originCoords.y + diagTextYOffset; break;
+								case 0: lx = originCoords.x + diagTextXOffset - dx; ly = originCoords.y + diagTextYOffset; break;
+								case 1: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - dy; break;
+								case 2: lx = originCoords.x + diagTextXOffset + dx; ly = originCoords.y + diagTextYOffset; break;
+								default: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + dy; break;
 							}
 						}
+						// Character builds upwards from ground
 						lz = baseZ + diagTextZOffset + (charIdx * diagTextBias) + ((CHAR_HEIGHT - 1 - row) * diagTextZSpacing);
+					
+					// VERTICAL TEXT
 					} else {
-						const colDx = (col * diagTextXSpacing) + (charIdx * diagTextBias);
-						const colDy = (col * diagTextYSpacing) + (charIdx * diagTextBias);
-						if (diagTextAlignment === 0) {
+				const colDx = (col * diagTextXSpacing) + (charIdx * diagTextBias);
+				const colDy = (col * diagTextYSpacing) + (charIdx * diagTextBias);
+				if (diagTextAlignment === 0) {
+					switch (rotation) {
+						case 0: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
+						case 1: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
+						case 2: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
+						default: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
+					}
+				} else {
+					const axisAdvance = (col * diagTextXSpacing) + (charIdx * diagTextBias);
 							switch (rotation) {
-								case 0: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
-								case 1: lx = originCoords.x + diagTextXOffset - colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
-								case 2: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset - colDy; break;
-								default: lx = originCoords.x + diagTextXOffset + colDx; ly = originCoords.y + diagTextYOffset + colDy; break;
-							}
-						} else {
-							const axisAdvance = (col * diagTextXSpacing) + (charIdx * diagTextBias);
-							switch (rotation) {
-								case 0: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + axisAdvance; break;
-								case 1: lx = originCoords.x + diagTextXOffset - axisAdvance; ly = originCoords.y + diagTextYOffset; break;
-								case 2: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - axisAdvance; break;
-								default: lx = originCoords.x + diagTextXOffset + axisAdvance; ly = originCoords.y + diagTextYOffset; break;
+						case 0: lx = originCoords.x + diagTextXOffset - axisAdvance; ly = originCoords.y + diagTextYOffset; break;
+										case 1: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset - axisAdvance; break;
+										case 2: lx = originCoords.x + diagTextXOffset + axisAdvance; ly = originCoords.y + diagTextYOffset; break;
+										default: lx = originCoords.x + diagTextXOffset; ly = originCoords.y + diagTextYOffset + axisAdvance; break;
 							}
 						}
-						lz = baseZ + diagTextZOffset - (charIdx * ((CHAR_HEIGHT * diagTextZSpacing) + diagTextKerning)) + ((CHAR_HEIGHT - 1 - row) * diagTextZSpacing);
+						// Shift whole word UP, then subtract charIdx to stack downwards, and build char upwards
+						lz = baseZ + diagTextZOffset + wordVerticalShift - (charIdx * charZStep) + ((CHAR_HEIGHT - 1 - row) * diagTextZSpacing);
 					}
+					
 					const createdEntity = map.createEntity("litter", { x: lx, y: ly, z: lz });
 					if (createdEntity && createdEntity.id !== null) {
 						(<Litter>createdEntity).litterType = litterType;
@@ -647,6 +678,18 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 	const rotation = ui.mainViewport.rotation;
 	lastPlacedLitterIds = []; 
 
+	// PRE-CALCULATE HEIGHT: Sum all pixels to figure out how tall the image is
+	let totalPixels = 0;
+	const tempRegex = /(\d*)([A-LX])/g;
+	let tempMatch;
+	while ((tempMatch = tempRegex.exec(imgData)) !== null) {
+		totalPixels += tempMatch[1] ? parseInt(tempMatch[1], 10) : 1;
+	}
+	const imgHeight = Math.ceil(totalPixels / imgWidth);
+	
+	// If drawing a vertical wall, shift the whole thing up so the bottom hits the ground
+	const verticalShift = (imgPrintPlane > 0) ? ((imgHeight - 1) * imgPrintScale) : 0;
+
 	let pixelIndex = 0;
 	const regex = /(\d*)([A-LX])/g;
 	let match;
@@ -660,48 +703,44 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 			for (let i = 0; i < count; i++) {
 				const currentPos = pixelIndex + i;
 				
-				// Standard 2D Grid coordinates
 				const gridX = currentPos % imgWidth;
 				const gridY = Math.floor(currentPos / imgWidth);
 
-				// Origin with user offsets applied
 				const ox = originCoords.x + imgPrintXOffset;
 				const oy = originCoords.y + imgPrintYOffset;
 				const oz = baseZ + imgPrintZOffset;
 
-				// Scale coordinates
 				const dx = gridX * imgPrintScale;
 				const dy = gridY * imgPrintScale;
 
 				let lx: number = 0, ly: number = 0, lz: number = 0;
 
-				// Apply 3D math based on Plane selection
 				if (imgPrintPlane === 0) { 
 					// FLOOR (Lays flat on XY plane)
 					lz = oz;
 					switch (rotation) {
-						case 0: lx = ox + dx; ly = oy + dy; break;
-						case 1: lx = ox - dy; ly = oy + dx; break;
-						case 2: lx = ox - dx; ly = oy - dy; break;
-						case 3: lx = ox + dy; ly = oy - dx; break;
+						case 0: lx = ox - dx; ly = oy + dy; break;
+						case 1: lx = ox - dy; ly = oy - dx; break;
+						case 2: lx = ox + dx; ly = oy - dy; break;
+						case 3: lx = ox + dy; ly = oy + dx; break;
 					}
 				} else if (imgPrintPlane === 1) {
 					// ORTHOG (Vertical wall, aligned to map grid)
-					lz = oz - dy;
+					lz = oz + verticalShift - dy; // Builds upward from baseZ!
 					switch (rotation) {
-						case 0: lx = ox + dx; ly = oy; break;
-						case 1: lx = ox; ly = oy + dx; break;
-						case 2: lx = ox - dx; ly = oy; break;
-						case 3: lx = ox; ly = oy - dx; break;
+					case 0: lx = ox - dx; ly = oy; break;
+					case 1: lx = ox; ly = oy - dx; break;
+					case 2: lx = ox + dx; ly = oy; break;
+					case 3: lx = ox; ly = oy + dx; break;
 					}
 				} else if (imgPrintPlane === 2) {
 					// DIAG (Vertical wall, square to isometric screen)
-					lz = oz - dy;
+					lz = oz + verticalShift - dy; // Builds upward from baseZ!
 					switch (rotation) {
-						case 0: lx = ox + dx; ly = oy - dx; break;
-						case 1: lx = ox + dx; ly = oy + dx; break;
-						case 2: lx = ox - dx; ly = oy + dx; break;
-						case 3: lx = ox - dx; ly = oy - dx; break;
+						case 0: lx = ox - dx; ly = oy + dx; break;
+						case 1: lx = ox - dx; ly = oy - dx; break;
+						case 2: lx = ox + dx; ly = oy - dx; break;
+						case 3: lx = ox + dx; ly = oy + dx; break;
 					}
 				}
 
@@ -734,12 +773,12 @@ function undoLastPlacement(): void {
 		ui.showError("Undo", "Nothing to undo!");
 		return;
 	}
-	let removedCount = 0;
+	//let removedCount = 0;
 	for (let i = 0; i < lastPlacedLitterIds.length; i++) {
 		const entity = map.getEntity(lastPlacedLitterIds[i]);
 		if (entity && entity.type === "litter") {
 			entity.remove();
-			removedCount++;
+			//removedCount++;
 		}
 	}
 	lastPlacedLitterIds = []; 

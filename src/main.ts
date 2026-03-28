@@ -1,9 +1,10 @@
 import { isUiAvailable } from "./helpers/environment";
 import { debug } from "./helpers/logger";
 import { LitterEditorWindow } from "./ui/window";
+import { initShortcuts } from "./helpers/initShortcutKeys";
 
 
-const window = new LitterEditorWindow();
+export const mainWindow = new LitterEditorWindow();
 
 
 /**
@@ -18,5 +19,7 @@ export function main(): void
 		return;
 	}
 
-	ui.registerMenuItem("Litter Editor", () => window.open());
+	initShortcuts();
+
+	ui.registerMenuItem("Litter Editor", () => mainWindow.open());
 }
