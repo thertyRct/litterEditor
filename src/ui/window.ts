@@ -307,7 +307,7 @@ export class LitterEditorWindow {
 					},
 					// TAB 6: INFO
 					{
-						image: { frameBase: 5367, frameCount: 8, frameDuration: 4, },
+						image:  5367,
 						widgets: [
 							<GroupBoxWidget>{ type: "groupbox", x: 10, y: 55, width: 240, height: 170, text: "Info", },
 							<LabelWidget>{ type: "label", x: 20, y: 120, width: 220, height: widgetLineHeight, textAlign: "centred", text: "This LitterEditor is my first expierence with coding.\n\nSpecial thanks to:\nManticore_007, Basssiiie, Smitty\nand Gymnasiast.\n\ngithub.com/EnoxRCT/OpenRCT2-LitterEditor", },
