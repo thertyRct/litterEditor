@@ -1,4 +1,4 @@
-import { mainWindow } from "../main";
+import { LitterEditorWindow } from "../ui/window";
 
 export const shortcutId =
 {
@@ -30,7 +30,7 @@ export const shortcutBindings =
     cycle: ["CTRL+SHIFT+C"]
 };
 
-export function initShortcuts(): void
+export function initShortcuts(mainWindow: LitterEditorWindow): void
 {
     ui.registerShortcut({
         id: shortcutId.open,

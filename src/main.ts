@@ -19,7 +19,7 @@ export function main(): void
 		return;
 	}
 
-	initShortcuts();
+	initShortcuts(mainWindow);
 
 	ui.registerMenuItem("Litter Editor", () => mainWindow.open());
 }
