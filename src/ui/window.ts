@@ -111,9 +111,9 @@ export const litterTypeList: LitterType[] = ["vomit", "vomit_alt", "empty_can", 
 let lastPlacedLitterIds: number[] = [];
 
 function spinnerTextInput(title: string, description: string, getVal: () => number, min: number, max: number, set: (n: number) => void): () => void {
-	return () => ui.showTextInput({
+	return (): void => ui.showTextInput({
 		title, description, initialValue: getVal().toString(),
-		callback: (v) => { const n = parseInt(v); if (!isNaN(n)) { set(Math.max(min, Math.min(max, n))); } }
+		callback: (v): void => { const n = parseInt(v); if (!isNaN(n)) { set(Math.max(min, Math.min(max, n))); } }
 	});
 }
 
