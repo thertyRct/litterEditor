@@ -33,6 +33,8 @@ To use the Image Printer feature, you must first convert your images using the B
 
 **Address**: [https://thertyrct.github.io/litterEditor/](https://thertyrct.github.io/litterEditor/)
 
+Follow the instructions on the webtool to generate the data string required by the in-game Image Printer tab.
+
 ## Shortcut Defaults
 
 The following keyboard shortcuts are configured by default. These can be customized in the OpenRCT2 Options menu under the "Shortcut Keys" tab.
@@ -45,4 +47,3 @@ The following keyboard shortcuts are configured by default. These can be customi
 *   **Cycle Litter Type**: CTRL+SHIFT+C (Cycles between vomit and trash)
 
 
-Follow the instructions on the webtool to generate the data string required by the in-game Image Printer tab.
