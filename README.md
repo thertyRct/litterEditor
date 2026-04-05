@@ -1,46 +1,49 @@
-# LitterEditor plugin for OpenRCT2
+# OpenRCT2 Litter Editor
 
-## Installation
+A specialized tool for OpenRCT2 that allows you to place, manipulate, and generate complex patterns using litter (vomit and trash). Move beyond simple cleanup and use litter as a creative medium for track detailing, custom signage, and image reproduction.
 
-1. Download the latest version of the plugin from the [Releases page](https://github.com/EnoxRCT/OpenRCT2-LitterEditor/releases/tag/v1.1).
-2. To install it, put the downloaded `*.js` file into your `/OpenRCT2/plugin` folder.
-    - Easiest way to find the OpenRCT2-folder is by launching the OpenRCT2 game, click and hold on the red toolbox in the main menu, and select "Open custom content folder".
-    - Otherwise this folder is commonly found in `C:/Users/<YOUR NAME>/Documents/OpenRCT2/plugin` on Windows.
-    - If you already had this plugin installed before, you can safely overwrite the old file.
-3. Once the file is there, it should show up ingame in the dropdown menu under the map icon.
+## Features
 
----
+### 1. Manual Litter Manipulation
+*   **Precision Placement**: Place specific types of litter (vomit or trash) exactly where you want them.
+*   **Coordinate Control**: Manually adjust the X, Y, and Z (height) coordinates of existing litter elements.
+*   **Pipette Tool**: Quickly select existing litter on the map to view and edit its properties.
+*   **Multiplier Settings**: Toggle between x1, x10, and x100 increments for rapid coordinate adjustments.
 
-## Building the source code
+### 2. Track Distributor
+*   **Ride Integration**: Select any ride in your park and distribute litter along its track layout. It distributes litter by 32 unit increments, so it is consistent across any length of track piece.
+*   **Custom Density**: Control the number of litter items generated along the track.
+*   **Vertical Offsets**: Set height offsets to position litter above or below the track surface for unique effects.
 
-This project is based on [wisnia74's Typescript modding template](https://github.com/wisnia74/openrct2-typescript-mod-template) and uses [Nodemon](https://nodemon.io/), [ESLint](https://eslint.org/) and [TypeScript](https://www.typescriptlang.org/) from this template.
+### 3. Diagonal Text Tool
+*   **Custom Signage**: "Print" text strings onto the map using litter as pixels.
+*   **Typography Controls**: Adjust kerning (character spacing) and relative spacing across X, Y, and Z axes.
+*   **Alignment and Bias**: Fine-tune the positioning and slant of the generated text.
+*   **Undo Support**: Quickly remove the last generated text string if it needs adjustment.
 
-1. Install latest version of [Node](https://nodejs.org/en/) and make sure to include NPM in the installation options.
-2. Clone the project to a location of your choice on your PC.
-3. Open command prompt, use `cd` to change your current directory to the root folder of this project and run `npm install`.
-4. Find `openrct2.d.ts` TypeScript API declaration file in OpenRCT2 files and copy it to `lib` folder (this file can usually be found in `C:/Users/<YOUR NAME>/Documents/OpenRCT2/bin/` or `C:/Program Files/OpenRCT2/`).
-    - Alternatively, you can make a symbolic link instead of copying the file, which will keep the file up to date whenever you install new versions of OpenRCT2.
-5. Run `npm run build` (release build) or `npm run build:dev` (develop build) to build the project.
-    - Default output folder for release builds: `(project directory)/dist`
-    - Default output folder for develop builds: `(documents)/OpenRCT2/plugins`
-    - If your plugin folder is located elsewhere (on for example a non-Windows OS), you can modify it in `rollup.config.js`.
+### 4. Image Printer
+*   **Pixel Art Generation**: Convert image data into litter-based patterns.
+*   **Web Integration**: Use the companion web tool to convert your own images into the required format.
+*   **Multi-Plane Support**: Print images on different spatial planes to create 3D litter structures.
+*   **Undo Support**: Quickly remove the last generated bmp if it needs adjustment.
 
-### Hot reload
+## Image Conversion Web Tool
 
-This project supports the [OpenRCT2 hot reload feature](https://github.com/OpenRCT2/OpenRCT2/blob/master/distribution/scripting.md#writing-scripts) for development.
+To use the Image Printer feature, you must first convert your images using the BMP webtool:
 
-1. Make sure you've enabled it by setting `enable_hot_reloading = true` in your `/OpenRCT2/config.ini`.
-2. If you are on a non-Windows OS, open `rollup.config.js` and change the output file path to your plugin folder.
-    - Example: `C:/OpenRCT2/plugin/LitterEditor.js`.
-    - Make sure this path uses `/` instead of `\` slashes!
-3. Open command prompt and use `cd` to change your current directory to the root folder of this project.
-4. Run `npm start` to start the hot reload server.
-5. Use the `/OpenRCT2/bin/openrct2.com` executable to [start OpenRCT2 with console](https://github.com/OpenRCT2/OpenRCT2/blob/master/distribution/scripting.md#writing-scripts) and load a save or start new game.
-6. Each time you save any of the files in `./src/`, the server will compile `./src/registerPlugin.ts` and place compiled plugin file inside your local OpenRCT2 plugin directory.
-7. OpenRCT2 will notice file changes and it will reload the plugin.
+**Address**: [https://thertyrct.github.io/litterEditor/](https://thertyrct.github.io/litterEditor/)
 
-## Notes
+Follow the instructions on the webtool to generate the data string required by the in-game Image Printer tab.
 
-Don't touch `app.js`, even though it's just an empty file. Its existence makes Nodemon happy, and Nodemon is what watches your files for changes & fires off new dev builds for hot reloading.
+## Shortcut Defaults
 
-Thanks to [Basssiiie](https://github.com/Basssiiie) and [wisnia74](https://github.com/wisnia74/openrct2-typescript-mod-template) for providing the template for this mod and readme.
+The following keyboard shortcuts are configured by default. These can be customized in the OpenRCT2 Options menu under the "Shortcut Keys" tab.
+
+*   **Open Litter Editor**: CTRL+SHIFT+L
+*   **Select Litter**: CTRL+SHIFT+P (Activates pipette tool)
+*   **Delete Litter**: CTRL+SHIFT+D (Activates deletion tool)
+*   **Toggle Multiplier**: CTRL+SHIFT+M (Cycles x1, x10, x100)
+*   **Place Litter**: CTRL+SHIFT+B (Activates placement tool)
+*   **Cycle Litter Type**: CTRL+SHIFT+C (Cycles between vomit and trash)
+
+
