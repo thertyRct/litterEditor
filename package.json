@@ -1,9 +1,9 @@
 {
     "name": "openrct2-litter-editor",
-    "author": "Enox",
+    "author": "Enox, therty",
     "license": "MIT",
-    "version": "1.1",
-    "description": "",
+    "version": "2.0",
+    "description": "A specialized tool to place, manipulate, and generate complex patterns using litter (vomit and trash) as a creative medium.",
     "main": "app.js",
     "scripts": {
         "start": "npm run watch",
@@ -14,11 +14,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/EnoxRCT/OpenRCT2-LitterEditor.git"
+        "url": "git+https://github.com/thertyrct/litterEditor.git"
     },
-    "homepage": "https://github.com/EnoxRCT/OpenRCT2-LitterEditor#readme",
+    "homepage": "https://thertyrct.github.io/litterEditor/",
     "bugs": {
-        "url": "https://github.com/EnoxRCT/OpenRCT2-LitterEditor/issues"
+        "url": "https://github.com/thertyrct/litterEditor/issues"
     },
     "devDependencies": {
         "@rollup/plugin-replace": "^3.0.0",
