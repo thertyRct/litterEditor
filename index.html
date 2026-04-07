@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenRCT2 Litter Editor Plugin</title>
+    <title>OpenRCT2 Litter Editor & Studio</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* Base Styles from Original Tool */
@@ -91,7 +91,7 @@
 
     <nav class="sticky-nav">
         <a href="#about">About</a>
-        <a href="#studio">BMP Import Tool</a>
+        <a href="#studio">Image Studio</a>
         <a href="https://github.com/thertyrct/litterEditor">GitHub Repo</a>
     </nav>
 
@@ -104,12 +104,12 @@
         <hr style="border: 0; border-top: 1px solid #444; margin: 60px 0;">
 
         <section id="studio">
-            <h2 style="text-align: center; color: #51cf66;">Litter BMP Import Tool</h2>
+            <h2 style="text-align: center; color: #51cf66;">Litter Image Studio Tool</h2>
             <p style="text-align: center; margin-bottom: 30px; color: #aaa;">Use the canvas below to design your litter patterns or upload an image to convert it into an OpenRCT2 data string.</p>
             
             <div class="box">
                 <h3>1. Import (Optional)</h3>
-                <p style="font-size: 0.9em; color: #ccc; margin-top: 0;">Upload an image to map it to the litter palette.</p>
+                <p style="font-size: 0.9em; color: #ccc; margin-top: 0;">Upload an image. It will be mapped to the litter palette and centered on the 32x32 canvas below for editing.</p>
                 <input type="file" id="imageLoader" accept="image/png, image/bmp, image/jpeg"/>
                 
                 <div class="chroma-controls">
@@ -240,6 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     selectTool(PALETTE[0]);
 
+    // --- RESTORED CANVAS INTERACTION ---
     const canvas = document.getElementById('editorCanvas');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     let isDrawing = false;
@@ -249,8 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        const x = Math.floor((e.clientX || e.touches[0].clientX - rect.left) * scaleX);
-        const y = Math.floor((e.clientY || e.touches[0].clientY - rect.top) * scaleY);
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
 
         if (x >= 0 && x < 32 && y >= 0 && y < 32) {
             if (activeTool === 'eraser') {
@@ -262,15 +263,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Mouse Events
     canvas.addEventListener('mousedown', (e) => { isDrawing = true; drawPixel(e); });
     canvas.addEventListener('mousemove', drawPixel);
-    window.addEventListener('mouseup', () => { if(isDrawing) { isDrawing = false; generateRLE(); } });
+    window.addEventListener('mouseup', () => { 
+        if(isDrawing) { isDrawing = false; generateRLE(); } 
+    });
 
+    // Restored Touch Events
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDrawing = true; 
+        drawPixel(e.touches[0]); 
+    }, {passive: false});
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        drawPixel(e.touches[0]); 
+    }, {passive: false});
+    window.addEventListener('touchend', () => { 
+        if(isDrawing) { isDrawing = false; generateRLE(); } 
+    });
+
+    // Clear Canvas Button
     document.getElementById('btnClear').addEventListener('click', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         generateRLE();
     });
 
+    // --- IMAGE UPLOAD & CHROMA KEY ---
     const imageLoader = document.getElementById('imageLoader');
     const useChromaKeyCb = document.getElementById('useChromaKey');
     const chromaKeyColorInput = document.getElementById('chromaKeyColor');
@@ -328,6 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.putImageData(imgData, 0, 0);
     }
 
+    // --- RLE COMPRESSION & OUTPUT ---
     const outputString = document.getElementById('outputString');
     const charCount = document.getElementById('charCount');
     const limitWarning = document.getElementById('limitWarning');
