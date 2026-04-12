@@ -393,12 +393,21 @@ document.addEventListener('DOMContentLoaded', () => {
         let compressedData = "";
         let count = 1;
         for (let i = 1; i <= pixelArray.length; i++) {
-            if (pixelArray[i] === pixelArray[i - 1]) { count++; } 
-            else {
-                compressedData += (count > 1 ? count : "") + pixelArray[i - 1];
+            if (pixelArray[i] === pixelArray[i - 1]) {
+                count++;
+            } else {
+                // Convert count to Base36 (lowercase). If count is 1, omit it.
+                let countStr = (count > 1) ? count.toString(36).toLowerCase() : "";
+                compressedData += countStr + pixelArray[i - 1];
                 count = 1; 
             }
         }
+
+        // Strip trailing transparent runs (e.g., if it ends in 'X' or '5X' or 'aX')
+        compressedData = compressedData.replace(/[0-9a-z]*X$/, '');
+
+        const finalString = `${croppedW}:${compressedData}`;
+        outputString.value = finalString;
 
         const finalString = `${croppedW}:${compressedData}`;
         outputString.value = finalString;
