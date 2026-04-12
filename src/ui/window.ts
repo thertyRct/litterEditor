@@ -687,22 +687,28 @@ function placeImageFromRLE(originCoords: CoordsXY, baseZ: number, rleString: str
 
 	// PRE-CALCULATE HEIGHT: Sum all pixels to figure out how tall the image is
 	let totalPixels = 0;
-	const tempRegex = /(\d*)([A-LX])/g;
+	// UPDATE: Regex now accepts numbers and lowercase letters for the count
+	const tempRegex = /([0-9a-z]*)([A-LX])/g;
 	let tempMatch;
 	while ((tempMatch = tempRegex.exec(imgData)) !== null) {
-		totalPixels += tempMatch[1] ? parseInt(tempMatch[1], 10) : 1;
+		// UPDATE: Parse as Base36 instead of Base10
+		totalPixels += tempMatch[1] ? parseInt(tempMatch[1], 36) : 1;
 	}
+	// Note: Because of Math.ceil, the trailing 'X' truncation optimization from the 
+	// webtool will safely resolve to the correct height here.
 	const imgHeight = Math.ceil(totalPixels / imgWidth);
 	
 	// If drawing a vertical wall, shift the whole thing up so the bottom hits the ground
 	const verticalShift = (imgPrintPlane > 0) ? ((imgHeight - 1) * imgPrintScale) : 0;
 
 	let pixelIndex = 0;
-	const regex = /(\d*)([A-LX])/g;
+	// UPDATE: Same regex update here
+	const regex = /([0-9a-z]*)([A-LX])/g;
 	let match;
 
 	while ((match = regex.exec(imgData)) !== null) {
-		const count = match[1] ? parseInt(match[1], 10) : 1;
+		// UPDATE: Parse as Base36 instead of Base10
+		const count = match[1] ? parseInt(match[1], 36) : 1;
 		const char = match[2];
 
 		if (char !== 'X') {
