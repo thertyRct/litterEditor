@@ -134,12 +134,10 @@
                 
                 <div style="flex-grow: 1; min-width: 250px;">
                     <p style="margin-top: 0;"><strong>3. Copy to OpenRCT2:</strong></p>
-                    <textarea id="outputString" readonly placeholder="Draw on the canvas or upload an image..."></textarea>
-                    <div id="charCount" class="success">Length: 0 chars</div>
-                    <div id="limitWarning" class="warning" style="display: none;">
-                        WARNING: Exceeds OpenRCT2's 255 character limit!<br>
-                        <span style="font-size: 0.9em; font-weight: normal;">Try using the Eraser tool to trim the edges.</span>
+                    <div id="outputContainer">
+                        <textarea readonly placeholder="Draw on the canvas or upload an image..."></textarea>
                     </div>
+                    <div id="charCount" class="success">Length: 0 chars</div>
                     
                     <h3 style="margin-top: 20px;">Litter Reference</h3>
                     <p style="font-size: 0.8em; color: #ccc; margin-top: 0;">Click a row to select your brush.</p>
@@ -349,9 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- RLE COMPRESSION & OUTPUT ---
-    const outputString = document.getElementById('outputString');
+    const outputContainer = document.getElementById('outputContainer');
     const charCount = document.getElementById('charCount');
-    const limitWarning = document.getElementById('limitWarning');
 
     function generateRLE() {
         const imgData = ctx.getImageData(0, 0, 32, 32);
@@ -378,9 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (maxX === -1) {
-            outputString.value = "";
+            outputContainer.innerHTML = '<textarea readonly placeholder="Draw on the canvas or upload an image..."></textarea>';
             charCount.innerText = "Length: 0 chars";
-            limitWarning.style.display = "none";
             return;
         }
 
@@ -407,16 +403,23 @@ document.addEventListener('DOMContentLoaded', () => {
         compressedData = compressedData.replace(/[0-9a-z]*X$/, '');
 
         const finalString = `${croppedW}:${compressedData}`;
-        outputString.value = finalString;
-        const len = finalString.length;
-        charCount.innerText = `Length: ${len} chars`;
-        if (len > 255) {
-            charCount.className = "warning";
-            limitWarning.style.display = "block";
-        } else {
-            charCount.className = "success";
-            limitWarning.style.display = "none";
+        outputContainer.innerHTML = '';
+        
+        const chunkSize = 254;
+        const numChunks = Math.ceil(finalString.length / chunkSize);
+        
+        for (let i = 0; i < numChunks; i++) {
+            const chunkStr = finalString.substring(i * chunkSize, (i + 1) * chunkSize);
+            const ta = document.createElement('textarea');
+            ta.readOnly = true;
+            ta.value = chunkStr;
+            ta.onclick = function() { this.select(); };
+            outputContainer.appendChild(ta);
         }
+        
+        const len = finalString.length;
+        charCount.innerText = `Length: ${len} chars (${numChunks} part${numChunks !== 1 ? 's' : ''})`;
+        charCount.className = "success";
     }
 });
 </script>

@@ -278,14 +278,7 @@ export class LitterEditorWindow {
 							<ButtonDesc>{
 								type: "button", border: true, x: 70, y: 72, width: 70, height: widgetLineHeight + 2, text: "Set String...",
 								onClick: () => {
-									ui.showTextInput({
-										title: "Image Printer", description: "Paste the encoded string from the Web App:", initialValue: imgPrintString,
-										callback: value => {
-											imgPrintString = value;
-											const w = ui.getWindow(windowId);
-											if (w) { w.findWidget<LabelWidget>(imgPrintCurrentLabel).text = imgPrintString ? "(Loaded)" : "(none)"; }
-										}
-									});
+									promptForImageString("");
 								}
 							},
 							<LabelWidget>{ name: imgPrintCurrentLabel, type: "label", x: 145, y: 75, width: 100, height: widgetLineHeight, text: "(none)", },
@@ -644,6 +637,53 @@ function placeDiagonalText(originCoords: CoordsXY, baseZ: number, text: string, 
 }
 
 // --- TAB 5 FUNCTIONS (IMAGE PRINTER) ---
+function promptForImageString(accumulated: string = ""): void {
+	ui.showTextInput({
+		title: "Image Printer - Data",
+		description: accumulated.length > 0 ? `Accumulated ${accumulated.length} chars. Paste more:` : "Paste encoded string (or part of it):",
+		initialValue: "",
+		callback: text => {
+			const trimmed = text.replace(/\s+/g, "");
+			const newAccumulated = accumulated + trimmed;
+			openMoreConfirmationWindow(newAccumulated);
+		}
+	});
+}
+
+function openMoreConfirmationWindow(accumulated: string): void {
+	const dialogId = "litter-editor-img-string-confirm";
+	ui.openWindow({
+		classification: dialogId,
+		title: "Image Printer - Data",
+		width: 260,
+		height: 65,
+		colours: [windowColour, windowColour],
+		widgets: [
+			<LabelDesc>{ type: "label", x: 10, y: 20, width: 240, height: widgetLineHeight, text: `Accumulated ${accumulated.length} chars. Add more?` },
+			<ButtonDesc>{
+				type: "button", border: true, x: 10, y: 40, width: 70, height: 15, text: "Cancel",
+				onClick: () => ui.getWindow(dialogId)?.close()
+			},
+			<ButtonDesc>{
+				type: "button", border: true, x: 90, y: 40, width: 70, height: 15, text: "More?",
+				onClick: () => {
+					ui.getWindow(dialogId)?.close();
+					promptForImageString(accumulated);
+				}
+			},
+			<ButtonDesc>{
+				type: "button", border: true, x: 170, y: 40, width: 80, height: 15, text: "OK",
+				onClick: () => {
+					imgPrintString = accumulated;
+					const w = ui.getWindow(windowId);
+					if (w) { w.findWidget<LabelWidget>(imgPrintCurrentLabel).text = imgPrintString ? "(Loaded)" : "(none)"; }
+					ui.getWindow(dialogId)?.close();
+				}
+			}
+		]
+	});
+}
+
 function onImgPrintPlace(): void {
 	if (!imgPrintString) {
 		ui.showError("Error", "Please paste an image string first.");
