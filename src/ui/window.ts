@@ -665,14 +665,14 @@ function openMoreConfirmationWindow(accumulated: string): void {
 				onClick: () => ui.getWindow(dialogId)?.close()
 			},
 			<ButtonDesc>{
-				type: "button", border: true, x: 90, y: 40, width: 70, height: 15, text: "More?",
+				type: "button", border: true, x: 90, y: 40, width: 70, height: 15, text: "Yes",
 				onClick: () => {
 					ui.getWindow(dialogId)?.close();
 					promptForImageString(accumulated);
 				}
 			},
 			<ButtonDesc>{
-				type: "button", border: true, x: 170, y: 40, width: 80, height: 15, text: "OK",
+				type: "button", border: true, x: 170, y: 40, width: 80, height: 15, text: "No",
 				onClick: () => {
 					imgPrintString = accumulated;
 					const w = ui.getWindow(windowId);
