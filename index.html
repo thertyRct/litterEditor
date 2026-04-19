@@ -109,8 +109,8 @@
             
             <div class="box">
                 <h3>1. Import (Optional)</h3>
-                <p style="font-size: 0.9em; color: #ccc; margin-top: 0;">Upload an image. It will be mapped to the litter palette and centered on the 32x32 canvas below for editing.</p>
-                <input type="file" id="imageLoader" accept="image/png, image/bmp, image/jpeg"/>
+                <p style="font-size: 0.9em; color: #ccc; margin-top: 0;">Upload a .bmp image. It will be mapped to the litter palette. Large images are supported and previewed centered on the 32x32 canvas.</p>
+                <input type="file" id="imageLoader" accept=".bmp, image/bmp"/>
                 
                 <div class="chroma-controls">
                     <input type="checkbox" id="useChromaKey" checked>
@@ -192,6 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeTool = PALETTE[0]; 
     const tbody = document.getElementById('paletteTableBody');
     const miniPalette = document.getElementById('miniPalette');
+    
+    let fullCanvas = null;
+    let fullCtx = null;
 
     function selectTool(tool) {
         activeTool = tool;
@@ -258,6 +261,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = activeTool.hex;
                 ctx.fillRect(x, y, 1, 1);
             }
+            
+            // Update the underlying full-sized image data if it exists
+            if (fullCanvas && fullCtx) {
+                const offsetX = Math.floor((32 - fullCanvas.width) / 2);
+                const offsetY = Math.floor((32 - fullCanvas.height) / 2);
+                const fullX = x - offsetX;
+                const fullY = y - offsetY;
+                
+                if (fullX >= 0 && fullX < fullCanvas.width && fullY >= 0 && fullY < fullCanvas.height) {
+                    if (activeTool === 'eraser') {
+                        fullCtx.clearRect(fullX, fullY, 1, 1);
+                    } else {
+                        fullCtx.fillStyle = activeTool.hex;
+                        fullCtx.fillRect(fullX, fullY, 1, 1);
+                    }
+                }
+            }
         }
     }
 
@@ -265,7 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.addEventListener('mousedown', (e) => { isDrawing = true; drawPixel(e); });
     canvas.addEventListener('mousemove', drawPixel);
     window.addEventListener('mouseup', () => { 
-        if(isDrawing) { isDrawing = false; generateRLE(); } 
+        if(isDrawing) { 
+            isDrawing = false; 
+            generateRLE(fullCtx || ctx, fullCanvas ? fullCanvas.width : 32, fullCanvas ? fullCanvas.height : 32); 
+        } 
     });
 
     // Restored Touch Events
@@ -279,13 +302,18 @@ document.addEventListener('DOMContentLoaded', () => {
         drawPixel(e.touches[0]); 
     }, {passive: false});
     window.addEventListener('touchend', () => { 
-        if(isDrawing) { isDrawing = false; generateRLE(); } 
+        if(isDrawing) { 
+            isDrawing = false; 
+            generateRLE(fullCtx || ctx, fullCanvas ? fullCanvas.width : 32, fullCanvas ? fullCanvas.height : 32); 
+        } 
     });
 
     // Clear Canvas Button
     document.getElementById('btnClear').addEventListener('click', () => {
+        fullCanvas = null;
+        fullCtx = null;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        generateRLE();
+        generateRLE(ctx, 32, 32);
     });
 
     // --- IMAGE UPLOAD & CHROMA KEY ---
@@ -303,22 +331,31 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = function(event) {
             const img = new Image();
             img.onload = function() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 const w = img.width;
                 const h = img.height;
-                const offsetX = Math.floor((w) / 2);
-                const offsetY = Math.floor((h) / 2);
-                ctx.drawImage(img, 0, 0, w, h, offsetX, offsetY, w, h);
-                applyPaletteToCanvas();
-                generateRLE();
+                
+                fullCanvas = document.createElement('canvas');
+                fullCanvas.width = w;
+                fullCanvas.height = h;
+                fullCtx = fullCanvas.getContext('2d', { willReadFrequently: true });
+                fullCtx.drawImage(img, 0, 0);
+                
+                applyPaletteToCanvas(fullCtx, w, h);
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const offsetX = Math.floor((32 - w) / 2);
+                const offsetY = Math.floor((32 - h) / 2);
+                ctx.drawImage(fullCanvas, offsetX, offsetY);
+                
+                generateRLE(fullCtx, w, h);
             }
             img.src = event.target.result;
         }
         reader.readAsDataURL(e.target.files[0]);
     }
 
-    function applyPaletteToCanvas() {
-        const imgData = ctx.getImageData(0, 0, 32, 32);
+    function applyPaletteToCanvas(targetCtx, w, h) {
+        const imgData = targetCtx.getImageData(0, 0, w, h);
         const data = imgData.data;
         const useChroma = useChromaKeyCb.checked;
         const chromaHex = chromaKeyColorInput.value;
@@ -326,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const chromaG = parseInt(chromaHex.substring(3,5), 16);
         const chromaB = parseInt(chromaHex.substring(5,7), 16);
 
-        for (let i = 0; i < 32 * 32; i++) {
+        for (let i = 0; i < w * h; i++) {
             const idx = i * 4;
             const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
             if (a === 0) continue;
@@ -343,23 +380,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 data[idx] = closest.rgb[0]; data[idx+1] = closest.rgb[1]; data[idx+2] = closest.rgb[2]; data[idx+3] = 255;
             }
         }
-        ctx.putImageData(imgData, 0, 0);
+        targetCtx.putImageData(imgData, 0, 0);
     }
 
     // --- RLE COMPRESSION & OUTPUT ---
     const outputContainer = document.getElementById('outputContainer');
     const charCount = document.getElementById('charCount');
 
-    function generateRLE() {
-        const imgData = ctx.getImageData(0, 0, 32, 32);
+    function generateRLE(targetCtx = ctx, w = 32, h = 32) {
+        const imgData = targetCtx.getImageData(0, 0, w, h);
         const data = imgData.data;
-        let minX = 32, maxX = -1, minY = 32, maxY = -1;
+        let minX = w, maxX = -1, minY = h, maxY = -1;
         let chars2D = [];
 
-        for (let y = 0; y < 32; y++) {
+        for (let y = 0; y < h; y++) {
             let row = [];
-            for (let x = 0; x < 32; x++) {
-                const idx = (y * 32 + x) * 4;
+            for (let x = 0; x < w; x++) {
+                const idx = (y * w + x) * 4;
                 const a = data[idx+3];
                 if (a === 0) { row.push('X'); } 
                 else {
